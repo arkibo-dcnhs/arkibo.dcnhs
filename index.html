@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arkibo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="page">
+    <div class="auth-container">
+      <h1 class="logo">Arkibo</h1>
+      <div class="form">
+        <h2>Login</h2>
+        <input type="text" id="loginName" placeholder="Full Name">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="gotoSignUp()">Sign up</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGN UP PAGE -->
+  <div id="signupPage" class="page hidden">
+    <div class="auth-container">
+      <h1 class="logo">Arkibo</h1>
+      <div class="form">
+        <h2>Sign Up</h2>
+        <div class="terms-box">
+          <h3>Terms & Conditions</h3>
+          <div class="terms-content">
+            <p>
+              Welcome to Arkibo. By signing up, you agree to use this platform responsibly. 
+              Only teachers may upload files. Unauthorized activity will result in penalties. 
+              Students are not allowed to upload. Your actions are monitored.
+            </p>
+            <p>Scroll down to agree or disagree.</p>
+          </div>
+          <div class="terms-buttons">
+            <button onclick="showSignUpForm()">I Agree</button>
+            <button onclick="gotoLogin()">I Disagree</button>
+          </div>
+        </div>
+        <div id="signupFormFields" class="hidden">
+          <input type="text" id="signupName" placeholder="Full Name">
+          <input type="password" id="signupPass" placeholder="Password">
+          <select id="roleSelect" onchange="showExtraField()">
+            <option value="">Select Role</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+          <input type="text" id="extraField" placeholder="" class="hidden">
+          <button onclick="signup()">Sign Up</button>
+          <p>Already have an account? <a href="#" onclick="gotoLogin()">Login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="menuPage" class="page hidden">
+    <div class="header">
+      <img src="https://i.imgur.com/PjgVp6S.png" alt="Arkibo Logo" class="menu-logo">
+    </div>
+    <div class="header-buttons">
+      <button id="profileBtn" onclick="showProfile()">👤 Profile</button>
+      <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo-dcnhs-online/')">
+        🌐 Go to Arkibo Student-Teacher Network
+      </button>
+      <button onclick="goTo('archives')">📚 Study Archives</button>
+      <button onclick="goTo('ai')">🤖 Learn with Kibo AI</button>
+      <button onclick="goTo('sched')">🗓 Study Scheds & Reminders</button>
+      <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo.arcade/')">🎮 Arkibo Arcade</button>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="profilePage" class="page hidden">
+    <h2>Profile</h2>
+    <p id="profileName"></p>
+    <p id="profileRole"></p>
+    <button onclick="logout()">Logout</button>
+    <button onclick="backToMenu()">Back to Menu</button>
+  </div>
+
+  <!-- STUDY ARCHIVES -->
+  <div id="archivesPage" class="page hidden">
+    <h2>Arkibo Study Archives</h2>
+    <p class="warning">
+      ⚠️ STRICT WARNING: Only teachers may upload files. Misbehavior or unauthorized uploading 
+      will be penalized. Your Gmail account is visible when uploading.
+    </p>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1Jpy4xK8zB0NdFcUL-VE93mp_3cxacOLV?usp=drive_link')">
+      📝TEACHER: AMY POTENTE — GENERAL CHEMISTRY
+    </button>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1Ugoz9tKCzZpxCD8LpKPZvhAB8gXCC4yK?usp=drive_link')">
+      📝TEACHER: EIZEL TAGBACAOLA — PAGSUSULAT NG KULTURANG PILIPINO
+    </button>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1b6b1wA56konvtVymFIT4ZH7Z0mrzMkIb?usp=drive_link')">
+      📝TEACHER: MARIFE DIEZ — ENTREPRENEURSHIP
+    </button>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1NArX72DjVMbK2oY_e83rMBFINUxPPzK9?usp=drive_link')">
+      📝TEACHER: NENA HOYOHOY — GENERAL BIOLOGY
+    </button>
+    <button onclick="backToMenu()">Back to Menu</button>
+  </div>
+
+  <!-- KIBO AI -->
+  <div id="aiPage" class="page hidden">
+    <h2>Learn with Kibo AI</h2>
+    <img src="https://imgur.com/zoGcC04.png" alt="Kibo" class="kibo-img">
+    <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo.ai/')">
+      Learn with Kibo AI
+    </button>
+    <p>Trained with Noupe.com - Click Kibo to Chat!</p>
+    <button onclick="backToMenu()">Back to Menu</button>
+  </div>
+
+  <!-- STUDY SCHEDULER / REMINDERS PAGE -->
+  <section id="schedPage" class="page hidden">
+    <h2>📘 Study Scheduler & Reminders</h2>
+    <p>Create your own reminders or study schedules below. They’ll stay saved even after you close Arkibo!</p>
+
+    <div class="sched-container">
+      <div class="sched-box">
+        <h3>Create Reminder</h3>
+        <input type="text" id="reminderName" placeholder="Reminder name">
+        <input type="datetime-local" id="reminderDate">
+        <button onclick="addReminder()">Add Reminder</button>
+      </div>
+
+      <div class="sched-box">
+        <h3>Create Study Schedule</h3>
+        <input type="text" id="subject" placeholder="Subject">
+        <input type="datetime-local" id="studyTime">
+        <button onclick="addSchedule()">Add Schedule</button>
+      </div>
+    </div>
+
+    <div class="sched-directory">
+      <h3>View Your Entries</h3>
+      <button onclick="showPage('reminderListPage')">📅 Check Reminders</button>
+      <button onclick="showPage('scheduleListPage')">🕒 Check Schedules</button>
+    </div>
+
+    <button class="backBtn" onclick="backToMenu()">Back to Menu</button>
+  </section>
+
+  <!-- REMINDER LIST PAGE -->
+  <section id="reminderListPage" class="page hidden">
+    <h2>📝 Your Reminders</h2>
+    <ul id="reminderList"></ul>
+    <button class="backBtn" onclick="showPage('schedPage')">Back</button>
+  </section>
+
+  <!-- SCHEDULE LIST PAGE -->
+  <section id="scheduleListPage" class="page hidden">
+    <h2>📚 Your Study Schedules</h2>
+    <ul id="scheduleList"></ul>
+    <button class="backBtn" onclick="showPage('schedPage')">Back</button>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
