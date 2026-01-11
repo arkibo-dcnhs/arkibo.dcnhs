@@ -13,6 +13,10 @@
     .researcher-list { list-style: none; padding: 0; }
     .researcher-list li { padding: 5px 0; border-bottom: 1px solid #eee; }
     .hidden { display: none; }
+    
+    /* Contact Specific Styling */
+    .copy-link { color: #2e7d32; text-decoration: underline; cursor: pointer; font-weight: bold; }
+    .copy-link:hover { color: #1b5e20; }
   </style>
 </head>
 <body>
@@ -43,6 +47,7 @@
               Welcome to Arkibo. By signing up, you agree to use this platform responsibly. 
               Only teachers may upload files. Unauthorized activity will result in penalties. 
               Students are not allowed to upload. Your actions are monitored.
+              Your privacy is our priority. We use secure encryption and rigorous internal protocols to ensure your data remains safe, confidential, and protected at all times.
             </p>
             <p>Scroll down to agree or disagree.</p>
           </div>
@@ -118,6 +123,13 @@
           <li>Rhonet B. Aguro</li>
           <li>June Carl B. Revil</li>
         </ul>
+      </div>
+
+      <div class="about-section">
+        <h3>Contact Details</h3>
+        <p><strong>Email:</strong> <span class="copy-link" onclick="copyToClipboard('arkibodcnhs@gmail.com')">arkibodcnhs@gmail.com</span></p>
+        <p><strong>Phone:</strong> <span class="copy-link" onclick="copyToClipboard('09351744786')">09351744786</span></p>
+        <p><strong>Location:</strong> Dapitan City National High School, Lawaan, Banonong, Dapitan City, Zamboanga del Norte, Philippines.</p>
       </div>
     </div>
     <button onclick="backToMenu()">Back to Menu</button>
@@ -207,13 +219,8 @@
 
 <script src="script.js"></script>
 <script>
-  /* Ensure your script.js has a goTo function that handles 'about'. 
-     If not, you can add this to your script.js or keep it here:
-  */
   function goTo(page) {
-    // Hide all pages
     document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    // Show the requested page
     if (page === 'archives') document.getElementById('archivesPage').classList.remove('hidden');
     if (page === 'ai') document.getElementById('aiPage').classList.remove('hidden');
     if (page === 'sched') document.getElementById('schedPage').classList.remove('hidden');
@@ -223,6 +230,15 @@
   function backToMenu() {
     document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
     document.getElementById('menuPage').classList.remove('hidden');
+  }
+
+  /* CLIPBOARD FUNCTION */
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard: " + text);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   }
 </script>
 </body>
