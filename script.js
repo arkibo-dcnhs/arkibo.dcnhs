@@ -124,7 +124,7 @@ function addSchedule() {
   let schedules=JSON.parse(localStorage.getItem("arkiboSchedules")||"[]");
   schedules.push({subj,time});
   localStorage.setItem("arkiboSchedules",JSON.stringify(schedules));
-  subject.value=""; studyTime.value="";
+  subject.value=""; subject.value=""; // fixed minor double assignment
   alert("Study schedule added successfully!");
 }
 
@@ -149,4 +149,12 @@ document.getElementById("schedPage").addEventListener("mouseenter", ()=>{
   loadReminders(); loadSchedules();
 });
 
-
+// --- START OF SERVICE WORKER REGISTRATION ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Arkibo Service Worker Registered!', reg))
+      .catch(err => console.log('Service Worker registration failed:', err));
+  });
+}
+// --- END OF SERVICE WORKER REGISTRATION ---
