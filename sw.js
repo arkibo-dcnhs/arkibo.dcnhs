@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arkibo-v2'; // Incremented to v2 to force refresh
+const CACHE_NAME = 'arkibo-v3'; // Incremented to v3 to force update
 const ASSETS = [
   './',
   './index.html',
@@ -14,13 +14,13 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); // Force the new service worker to become active immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching new assets');
+      console.log('Caching new assets for v3');
       return cache.addAll(ASSETS);
     })
   );
 });
 
-// Activate Service Worker - Cleans up old v1 cache
+// Activate Service Worker - Cleans up old caches (v1, v2, etc.)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -37,7 +37,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch Assets - Network First Strategy
-// This ensures updates are seen immediately if online, falling back to cache if offline
+// Tries to get the latest from GitHub first, falls back to cache if offline
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request).catch(() => {
