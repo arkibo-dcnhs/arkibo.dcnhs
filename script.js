@@ -53,42 +53,32 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
     const email = document.getElementById("signupEmail").value;
     const pass = document.getElementById("signupPass").value;
     const role = document.getElementById("roleSelect").value;
-
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        const user = userCredential.user;
-
         const userData = {
-            uid: user.uid,
+            uid: userCredential.user.uid,
             fullName: name,
             role: role,
             email: email,
             reminders: [],
             schedules: []
         };
-
         if (role === 'student') {
             userData.lrn = document.getElementById("signupLRN").value;
             userData.section = document.getElementById("signupSection").value;
         } else {
             userData.empID = document.getElementById("signupEmpID").value;
         }
-
-        await setDoc(doc(db, "users", user.uid), userData);
+        await setDoc(doc(db, "users", userCredential.user.uid), userData);
         alert("Account Created Successfully!");
-    } catch (error) {
-        alert(error.message);
-    }
+    } catch (error) { alert(error.message); }
 });
 
 document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("loginEmail").value;
     const pass = document.getElementById("loginPass").value;
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-    } catch (error) {
-        alert("Login Failed: " + error.message);
-    }
+    try { await signInWithEmailAndPassword(auth, email, pass); } 
+    catch (error) { alert("Login Failed: " + error.message); }
 });
 
 window.logout = () => {
@@ -98,22 +88,17 @@ window.logout = () => {
     });
 };
 
-// --- AUTH OBSERVER ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(doc(db, "users", user.uid));
         if (docSnap.exists()) {
             localStorage.setItem("arkiboUser", JSON.stringify(docSnap.data()));
             showPage("menuPage");
             startNotificationCheck();
         }
-    } else {
-        showPage("loginPage");
-    }
+    } else { showPage("loginPage"); }
 });
 
-// --- PROFILE ---
 window.showProfile = () => {
     const user = JSON.parse(localStorage.getItem("arkiboUser"));
     if (user) {
@@ -124,73 +109,67 @@ window.showProfile = () => {
     }
 };
 
-// --- CLOUD REMINDERS & SCHEDS ---
+// --- CLOUD DATA HELPERS ---
+async function syncLocalData() {
+    const user = auth.currentUser;
+    if (user) {
+        const docSnap = await getDoc(doc(db, "users", user.uid));
+        if (docSnap.exists()) {
+            localStorage.setItem("arkiboUser", JSON.stringify(docSnap.data()));
+            return docSnap.data();
+        }
+    }
+    return JSON.parse(localStorage.getItem("arkiboUser"));
+}
+
 window.addReminder = async () => {
     const name = document.getElementById("reminderName").value;
     const date = document.getElementById("reminderDate").value;
-    if (!name || !date) return alert("Please fill in all fields");
-
-    const user = auth.currentUser;
-    if (user) {
-        const newReminder = { name, date };
-        await updateDoc(doc(db, "users", user.uid), { reminders: arrayUnion(newReminder) });
-        
-        const localData = JSON.parse(localStorage.getItem("arkiboUser"));
-        localData.reminders.push(newReminder);
-        localStorage.setItem("arkiboUser", JSON.stringify(localData));
-
+    if (!name || !date) return alert("Fill all fields");
+    if (auth.currentUser) {
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            reminders: arrayUnion({ name, date })
+        });
+        await syncLocalData();
+        alert("Reminder Saved!");
         document.getElementById("reminderName").value = "";
         document.getElementById("reminderDate").value = "";
-        alert("Reminder Saved to Cloud!");
-        enableNotifications(); // Prompt user to enable alerts
+        enableNotifications();
     }
 };
 
 window.addSchedule = async () => {
     const subj = document.getElementById("subject").value;
     const time = document.getElementById("studyTime").value;
-    if (!subj || !time) return alert("Please fill in all fields");
-
-    const user = auth.currentUser;
-    if (user) {
-        const newSched = { subj, time };
-        await updateDoc(doc(db, "users", user.uid), { schedules: arrayUnion(newSched) });
-
-        const localData = JSON.parse(localStorage.getItem("arkiboUser"));
-        localData.schedules.push(newSched);
-        localStorage.setItem("arkiboUser", JSON.stringify(localData));
-
+    if (!subj || !time) return alert("Fill all fields");
+    if (auth.currentUser) {
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            schedules: arrayUnion({ subj, time })
+        });
+        await syncLocalData();
+        alert("Schedule Saved!");
         document.getElementById("subject").value = "";
         document.getElementById("studyTime").value = "";
-        alert("Schedule Saved to Cloud!");
         enableNotifications();
     }
 };
 
 window.loadReminders = async () => {
-    const user = auth.currentUser;
-    const docSnap = await getDoc(doc(db, "users", user.uid));
-    const list = docSnap.data().reminders || [];
+    const data = await syncLocalData();
+    const list = data.reminders || [];
     const container = document.getElementById("reminderList");
-    
-    container.innerHTML = list.length === 0 ? "<p>No reminders yet.</p>" : list.map((r, i) => `
-        <li>
-            <span><strong>${r.name}</strong><br><small>${new Date(r.date).toLocaleString()}</small></span>
-            <button onclick="deleteCloudItem('reminders', ${i})" style="width:auto; background:#ff4d4d;">🗑️</button>
-        </li>`).join('');
+    container.innerHTML = list.length === 0 ? "<li>No reminders</li>" : list.map((r, i) => `
+        <li><span><strong>${r.name}</strong><br><small>${new Date(r.date).toLocaleString()}</small></span>
+        <button onclick="deleteCloudItem('reminders', ${i})" style="width:auto; background:red;">🗑️</button></li>`).join('');
 };
 
 window.loadSchedules = async () => {
-    const user = auth.currentUser;
-    const docSnap = await getDoc(doc(db, "users", user.uid));
-    const list = docSnap.data().schedules || [];
+    const data = await syncLocalData();
+    const list = data.schedules || [];
     const container = document.getElementById("scheduleList");
-
-    container.innerHTML = list.length === 0 ? "<p>No schedules yet.</p>" : list.map((s, i) => `
-        <li>
-            <span><strong>${s.subj}</strong><br><small>${new Date(s.time).toLocaleString()}</small></span>
-            <button onclick="deleteCloudItem('schedules', ${i})" style="width:auto; background:#ff4d4d;">🗑️</button>
-        </li>`).join('');
+    container.innerHTML = list.length === 0 ? "<li>No schedules</li>" : list.map((s, i) => `
+        <li><span><strong>${s.subj}</strong><br><small>${new Date(s.time).toLocaleString()}</small></span>
+        <button onclick="deleteCloudItem('schedules', ${i})" style="width:auto; background:red;">🗑️</button></li>`).join('');
 };
 
 window.deleteCloudItem = async (key, index) => {
@@ -198,60 +177,39 @@ window.deleteCloudItem = async (key, index) => {
     const docRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(docRef);
     const itemToRemove = docSnap.data()[key][index];
-
     await updateDoc(docRef, { [key]: arrayRemove(itemToRemove) });
-    const updatedUser = (await getDoc(docRef)).data();
-    localStorage.setItem("arkiboUser", JSON.stringify(updatedUser));
+    await syncLocalData();
     key === 'reminders' ? loadReminders() : loadSchedules();
 };
 
-// --- REFINED NOTIFICATIONS (Local Time Fix) ---
+// --- NOTIFICATIONS ---
 window.enableNotifications = () => {
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    } else {
-        // Test notification to confirm it's working
-        sendNotification("Arkibo", "System active and watching your schedule!");
-    }
+    if (Notification.permission !== "granted") { Notification.requestPermission(); }
 };
 
 function startNotificationCheck() {
-    console.log("Notification monitor started...");
-    
-    setInterval(() => {
-        const user = JSON.parse(localStorage.getItem("arkiboUser"));
+    console.log("Monitor Active...");
+    setInterval(async () => {
+        const user = await syncLocalData(); // Force fetch fresh data every minute
         if (!user) return;
-
-        // Get Local Time in YYYY-MM-DDTHH:MM format
+        
         const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000; // Get offset in milliseconds
+        const offset = now.getTimezoneOffset() * 60000;
         const localISOTime = new Date(now - offset).toISOString().slice(0, 16);
         
-        console.log("Checking time:", localISOTime); // This helps you debug in the console
+        console.log("Checking:", localISOTime);
 
-        // Check Reminders
         user.reminders?.forEach(r => { 
-            if (r.date === localISOTime) {
-                sendNotification("Arkibo Reminder", r.name);
-            } 
+            if (r.date === localISOTime) sendNotification("Arkibo Reminder", r.name); 
         });
-
-        // Check Schedules
         user.schedules?.forEach(s => { 
-            if (s.time === localISOTime) {
-                sendNotification("Study Time!", `Subject: ${s.subj}`);
-            } 
+            if (s.time === localISOTime) sendNotification("Study Time!", s.subj); 
         });
-    }, 60000); // Checks every minute
+    }, 60000);
 }
 
 function sendNotification(title, body) {
     if (Notification.permission === "granted") {
-        new Notification(title, { 
-            body, 
-            icon: "https://i.imgur.com/PjgVp6S.png",
-            badge: "https://i.imgur.com/PjgVp6S.png",
-            vibrate: [200, 100, 200]
-        });
+        new Notification(title, { body, icon: "https://i.imgur.com/PjgVp6S.png" });
     }
 }
