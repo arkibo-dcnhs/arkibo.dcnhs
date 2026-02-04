@@ -205,27 +205,53 @@ window.deleteCloudItem = async (key, index) => {
     key === 'reminders' ? loadReminders() : loadSchedules();
 };
 
-// --- NOTIFICATIONS ---
+// --- REFINED NOTIFICATIONS (Local Time Fix) ---
 window.enableNotifications = () => {
     if (Notification.permission !== "granted") {
         Notification.requestPermission();
+    } else {
+        // Test notification to confirm it's working
+        sendNotification("Arkibo", "System active and watching your schedule!");
     }
 };
 
 function startNotificationCheck() {
+    console.log("Notification monitor started...");
+    
     setInterval(() => {
         const user = JSON.parse(localStorage.getItem("arkiboUser"));
         if (!user) return;
-        const now = new Date();
-        const nowStr = now.toISOString().slice(0, 16); 
 
-        user.reminders?.forEach(r => { if (r.date === nowStr) sendNotification("Arkibo Reminder", r.name); });
-        user.schedules?.forEach(s => { if (s.time === nowStr) sendNotification("Study Time!", s.subj); });
-    }, 60000);
+        // Get Local Time in YYYY-MM-DDTHH:MM format
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000; // Get offset in milliseconds
+        const localISOTime = new Date(now - offset).toISOString().slice(0, 16);
+        
+        console.log("Checking time:", localISOTime); // This helps you debug in the console
+
+        // Check Reminders
+        user.reminders?.forEach(r => { 
+            if (r.date === localISOTime) {
+                sendNotification("Arkibo Reminder", r.name);
+            } 
+        });
+
+        // Check Schedules
+        user.schedules?.forEach(s => { 
+            if (s.time === localISOTime) {
+                sendNotification("Study Time!", `Subject: ${s.subj}`);
+            } 
+        });
+    }, 60000); // Checks every minute
 }
 
 function sendNotification(title, body) {
     if (Notification.permission === "granted") {
-        new Notification(title, { body, icon: "https://i.imgur.com/PjgVp6S.png" });
+        new Notification(title, { 
+            body, 
+            icon: "https://i.imgur.com/PjgVp6S.png",
+            badge: "https://i.imgur.com/PjgVp6S.png",
+            vibrate: [200, 100, 200]
+        });
     }
 }
