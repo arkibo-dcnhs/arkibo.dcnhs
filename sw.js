@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arkibo-v3'; // Incremented to v3 to force update
+const CACHE_NAME = 'arkibo-v4'; // Incremented to v4 to force update
 const ASSETS = [
   './',
   './index.html',
@@ -14,13 +14,13 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); // Force the new service worker to become active immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching new assets for v3');
+      console.log('Caching new assets for v4');
       return cache.addAll(ASSETS);
     })
   );
 });
 
-// Activate Service Worker - Cleans up old caches (v1, v2, etc.)
+// Activate Service Worker - Cleans up old caches (v1, v2, v3, etc.)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
