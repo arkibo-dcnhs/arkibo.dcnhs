@@ -6,19 +6,7 @@
   <title>Arkibo</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Added some basic styling for the new content to ensure it looks good */
-    .about-content { text-align: left; padding: 10px; line-height: 1.6; }
-    .motto-header { text-align: center; font-weight: bold; color: #2e7d32; margin-bottom: 20px; }
-    .about-section { margin-bottom: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #2e7d32; }
-    .researcher-list { list-style: none; padding: 0; }
-    .researcher-list li { padding: 5px 0; border-bottom: 1px solid #eee; }
-    .hidden { display: none; }
-    
-    /* Contact Specific Styling */
-    .copy-link { color: #2e7d32; text-decoration: underline; cursor: pointer; font-weight: bold; }
-    .copy-link:hover { color: #1b5e20; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="app">
@@ -27,11 +15,10 @@
     <div class="auth-container">
       <h1 class="logo">Arkibo</h1>
       <div class="form">
-        <h2>Login</h2>
-        <input type="text" id="loginName" placeholder="Full Name">
+        <input type="email" id="loginEmail" placeholder="Email">
         <input type="password" id="loginPass" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p>Don't have an account? <a href="#" onclick="gotoSignUp()">Sign up</a></p>
+        <button id="loginBtn">Login</button>
+        <p class="auth-switch">Don't have an account? <a href="#" onclick="gotoSignUp()">Sign up</a></p>
       </div>
     </div>
   </div>
@@ -40,34 +27,33 @@
     <div class="auth-container">
       <h1 class="logo">Arkibo</h1>
       <div class="form">
-        <h2>Sign Up</h2>
-        <div class="terms-box">
+        <div class="terms-box" id="termsBox">
           <h3>Terms & Conditions</h3>
           <div class="terms-content">
-            <p>
-              Welcome to Arkibo. By signing up, you agree to use this platform responsibly. 
-              Only teachers may upload files. Unauthorized activity will result in penalties. 
-              Students are not allowed to upload. Your actions are monitored.
-              Your privacy is our priority. We use secure encryption and rigorous internal protocols to ensure your data remains safe, confidential, and protected at all times.
-            </p>
-            <p>Scroll down to agree or disagree.</p>
+            <p>Welcome to Arkibo. Only teachers may upload files. Unauthorized activity will result in penalties. Students are not allowed to upload.</p>
           </div>
-          <div class="terms-buttons">
-            <button onclick="showSignUpForm()">I Agree</button>
-            <button onclick="gotoLogin()">I Disagree</button>
-          </div>
+          <button onclick="showSignUpForm()">I Agree</button>
+          <button onclick="gotoLogin()" class="btn-secondary">I Disagree</button>
         </div>
+
         <div id="signupFormFields" class="hidden">
+          <h2>Create Account</h2>
           <input type="text" id="signupName" placeholder="Full Name">
+          <input type="email" id="signupEmail" placeholder="Email">
           <input type="password" id="signupPass" placeholder="Password">
-          <select id="roleSelect" onchange="showExtraField()">
+          
+          <select id="roleSelect">
             <option value="">Select Role</option>
             <option value="student">Student</option>
             <option value="teacher">Teacher</option>
           </select>
-          <input type="text" id="extraField" placeholder="" class="hidden">
-          <button onclick="signup()">Sign Up</button>
-          <p>Already have an account? <a href="#" onclick="gotoLogin()">Login</a></p>
+
+          <input type="text" id="signupLRN" placeholder="LRN" class="hidden">
+          <input type="text" id="signupSection" placeholder="Section" class="hidden">
+          <input type="text" id="signupEmpID" placeholder="Employee Number" class="hidden">
+
+          <button id="signupBtn">Sign Up</button>
+          <p class="auth-switch">Already have an account? <a href="#" onclick="gotoLogin()">Login</a></p>
         </div>
       </div>
     </div>
@@ -79,12 +65,10 @@
     </div>
     <div class="header-buttons">
       <button id="profileBtn" onclick="showProfile()">👤 Profile</button>
-      <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo-dcnhs-online/')">
-        🌐 Go to Arkibo Student-Teacher Network
-      </button>
+      <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo-dcnhs-online/')">🌐 Arkibo Online Network</button>
       <button onclick="goTo('archives')">📚 Study Archives</button>
       <button onclick="goTo('ai')">🤖 Learn with Kibo AI</button>
-      <button onclick="goTo('sched')">🗓 Study Scheds & Reminders</button>
+      <button onclick="goTo('sched')">🗓 Study Scheds</button>
       <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo.arcade.update/')">🎮 Arkibo Arcade</button>
       <button onclick="goTo('about')">ℹ️ About Arkibo</button>
     </div>
@@ -92,25 +76,19 @@
 
   <div id="aboutPage" class="page hidden">
     <h2>About Arkibo</h2>
-    <div class="motto-header">
-      "LEARN. STORE. SOAR.<br>
-      WHERE LESSONS LIVE FOREVER."
-    </div>
-
     <div class="about-content">
       <div class="about-section">
         <h3>Vision</h3>
-        <p>To ignite a new era of academic excellence at Dapitan City National High School where no student is left behind due to a lack of resources. We envision a future where technology dissolves the barriers of distance and cost, transforming education from a burden into a seamless, empowering right for every learner.</p>
+        <li>To ignite a new era of academic excellence at Dapitan City National High School where no student is left behind due to a lack of resources. We envision a future where technology dissolves the barriers of distance and cost, transforming education from a burden into a seamless, empowering right for every learner.</li>
       </div>
 
       <div class="about-section">
         <h3>Mission</h3>
-        <p>Driven by the determination to bridge the digital divide, Arkibo exists to revolutionize the way our school community shares and masters knowledge. We are committed to:</p>
+        <li>Driven by the determination to bridge the digital divide, Arkibo exists to revolutionize the way our school community shares and masters knowledge.</li>
         <ul>
-          <li>Breaking down systemic barriers by providing every student, regardless of background, instant and free access to the high-quality materials they need to excel.</li>
-          <li>Cultivating a generation of self-reliant learners by putting a world of organized study tools—from modules to multimedia—directly into their hands.</li>
-          <li>Rescuing our educators from the exhaustion of manual resource distribution, allowing them to focus their passion on inspired teaching and professional growth.</li>
-          <li>Proving that through research and local digital transformation, we can build a more resilient and inclusive educational system for the Philippines.</li>
+          <li>Breaking down systemic barriers for all students.</li>
+          <li>Cultivating self-reliant learners.</li>
+          <li>Supporting educator growth.</li>
         </ul>
       </div>
 
@@ -129,118 +107,76 @@
       <div class="about-section">
         <h3>Contact Details</h3>
         <p><strong>Email:</strong> <span class="copy-link" onclick="copyToClipboard('arkibodcnhs@gmail.com')">arkibodcnhs@gmail.com</span></p>
-        <p><strong>Phone:</strong> <span class="copy-link" onclick="copyToClipboard('09351744786')">09351744786</span></p>
-        <p><strong>Location:</strong> Dapitan City National High School, Lawaan, Banonong, Dapitan City, Zamboanga del Norte, Philippines.</p>
+        <p><strong>Phone:</strong> <span>09351744786</span></p>
+        <p><strong>Location:</strong> Dapitan City National High School, Philippines.</p>
       </div>
     </div>
-    <button onclick="backToMenu()">Back to Menu</button>
+    <button class="backBtn" onclick="backToMenu()">Back to Menu</button>
   </div>
 
   <div id="profilePage" class="page hidden">
-    <h2>Profile</h2>
-    <p id="profileName"></p>
-    <p id="profileRole"></p>
-    <button onclick="logout()">Logout</button>
-    <button onclick="backToMenu()">Back to Menu</button>
+    <div class="auth-container">
+        <h2>My Profile</h2>
+        <div class="profile-details">
+            <p><strong>Name:</strong> <span id="profileName">---</span></p>
+            <p><strong>Role:</strong> <span id="profileRole">---</span></p>
+            <p id="profileExtraLabel"><strong>ID:</strong> <span id="profileExtra">---</span></p>
+        </div>
+        <button onclick="logout()" class="btn-danger">Logout</button>
+        <button onclick="backToMenu()" class="btn-secondary">Back</button>
+    </div>
   </div>
 
   <div id="archivesPage" class="page hidden">
-    <h2>Arkibo Study Archives</h2>
-    <p class="warning">
-      ⚠️ STRICT WARNING: Only teachers may upload files. Misbehavior or unauthorized uploading 
-      will be penalized. Your Gmail account is visible when uploading.
-    </p>
-    <button onclick="window.open('https://drive.google.com/drive/folders/1Jpy4xK8zB0NdFcUL-VE93mp_3cxacOLV?usp=drive_link')">
-      📝TEACHER: AMY POTENTE — GENERAL CHEMISTRY
-    </button>
-    <button onclick="window.open('https://drive.google.com/drive/folders/1Ugoz9tKCzZpxCD8LpKPZvhAB8gXCC4yK?usp=drive_link')">
-      📝TEACHER: EIZEL TAGBACAOLA — PAGSUSULAT NG KULTURANG PILIPINO
-    </button>
-    <button onclick="window.open('https://drive.google.com/drive/folders/1b6b1wA56konvtVymFIT4ZH7Z0mrzMkIb?usp=drive_link')">
-      📝TEACHER: MARIFE DIEZ — ENTREPRENEURSHIP
-    </button>
-    <button onclick="window.open('https://drive.google.com/drive/folders/1NArX72DjVMbK2oY_e83rMBFINUxPPzK9?usp=drive_link')">
-      📝TEACHER: NENA HOYOHOY — GENERAL BIOLOGY
-    </button>
-    <button onclick="backToMenu()">Back to Menu</button>
+    <h2>Study Archives</h2>
+    <p class="warning">⚠️ Only teachers may upload files.</p>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1Jpy4xK8zB0NdFcUL-VE93mp_3cxacOLV')">📝 AMY POTENTE</button>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1Ugoz9tKCzZpxCD8LpKPZvhAB8gXCC4yK')">📝 EIZEL TAGBACAOLA</button>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1b6b1wA56konvtVymFIT4ZH7Z0mrzMkIb')">📝 MARIFE DIEZ</button>
+    <button onclick="window.open('https://drive.google.com/drive/folders/1NArX72DjVMbK2oY_e83rMBFINUxPPzK9')">📝 NENA HOYOHOY</button>
+    <button class="backBtn" onclick="backToMenu()">Back</button>
   </div>
 
   <div id="aiPage" class="page hidden">
-    <h2>Learn with Kibo AI</h2>
+    <h2>Kibo AI</h2>
     <img src="https://imgur.com/zoGcC04.png" alt="Kibo" class="kibo-img">
-    <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo.ai/')">
-      Learn with Kibo AI
-    </button>
-    <p>Trained with Noupe.com - Click Kibo to Chat!</p>
-    <button onclick="backToMenu()">Back to Menu</button>
+    <button onclick="window.open('https://arkibo-dcnhs.github.io/arkibo.ai/')">Chat with Kibo AI</button>
+    <button class="backBtn" onclick="backToMenu()">Back</button>
   </div>
 
   <section id="schedPage" class="page hidden">
-    <h2>📘 Study Scheduler & Reminders</h2>
-    <p>Create your own reminders or study schedules below. They’ll stay saved even after you close Arkibo!</p>
-
+    <h2>📘 Study Scheduler</h2>
     <div class="sched-container">
       <div class="sched-box">
-        <h3>Create Reminder</h3>
         <input type="text" id="reminderName" placeholder="Reminder name">
         <input type="datetime-local" id="reminderDate">
         <button onclick="addReminder()">Add Reminder</button>
       </div>
-
       <div class="sched-box">
-        <h3>Create Study Schedule</h3>
         <input type="text" id="subject" placeholder="Subject">
         <input type="datetime-local" id="studyTime">
         <button onclick="addSchedule()">Add Schedule</button>
       </div>
     </div>
-
     <div class="sched-directory">
-      <h3>View Your Entries</h3>
-      <button onclick="showPage('reminderListPage')">📅 Check Reminders</button>
-      <button onclick="showPage('scheduleListPage')">🕒 Check Schedules</button>
+      <button onclick="showPage('reminderListPage')">📅 View Reminders</button>
+      <button onclick="showPage('scheduleListPage')">🕒 View Schedules</button>
     </div>
-
-    <button class="backBtn" onclick="backToMenu()">Back to Menu</button>
+    <button class="backBtn" onclick="backToMenu()">Back</button>
   </section>
 
   <section id="reminderListPage" class="page hidden">
-    <h2>📝 Your Reminders</h2>
+    <h2>📝 Reminders</h2>
     <ul id="reminderList"></ul>
     <button class="backBtn" onclick="showPage('schedPage')">Back</button>
   </section>
 
   <section id="scheduleListPage" class="page hidden">
-    <h2>📚 Your Study Schedules</h2>
+    <h2>📚 Study Schedules</h2>
     <ul id="scheduleList"></ul>
     <button class="backBtn" onclick="showPage('schedPage')">Back</button>
   </section>
 
-</div>
-
-<script src="script.js"></script>
-<script>
-  function goTo(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    if (page === 'archives') document.getElementById('archivesPage').classList.remove('hidden');
-    if (page === 'ai') document.getElementById('aiPage').classList.remove('hidden');
-    if (page === 'sched') document.getElementById('schedPage').classList.remove('hidden');
-    if (page === 'about') document.getElementById('aboutPage').classList.remove('hidden');
-  }
-
-  function backToMenu() {
-    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    document.getElementById('menuPage').classList.remove('hidden');
-  }
-
-  /* CLIPBOARD FUNCTION */
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Copied to clipboard: " + text);
-    }).catch(err => {
-      console.error('Failed to copy: ', err);
-    });
-  }
-</script>
+</div> <script type="module" src="script.js"></script>
 </body>
 </html>
